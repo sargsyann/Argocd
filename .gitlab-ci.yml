@@ -1,0 +1,31 @@
+stages:
+  - build
+  - test
+  - deploy
+
+image: node:latest
+
+node build: 
+  stage: build
+  script:
+    - npm install
+
+tests:
+  stage: test
+  script:
+    - npm i test-npm-ci-cd
+
+Deploy:
+  stage: deploy
+  image: docker
+  services: 
+    - docker:dind
+  tags: 
+    - node-linux
+
+  #before_script:
+   # - docker login -u $Docker_Login --password-stdin $Docker_Password
+  script: 
+    - docker build -f ./dockerfile -t app:latest .
+    - docker rm -vf app
+    - docker run --name app -d -p3000:3000 app:latest 

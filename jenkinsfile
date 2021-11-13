@@ -1,0 +1,23 @@
+pipeline {
+  tools {node "latest"}
+  stages {
+    stage('node build') {
+      steps {
+        sh 'npm install'
+      }
+    }
+    stage('tests') {
+      steps {
+        sh 'npm test'
+      }
+    }
+    stage('Deploy') {
+        tools{docker 'dind'}
+        steps {
+          sh 'docker build -f ./dockerfile -t app:latest .'
+          sh 'docker rm -vf app'
+          sh 'docker run --name app -d -p3000:3000 app:latest'
+        } 
+    }  
+  }
+}
